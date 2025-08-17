@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "packageManager": "pnpm@10.14.0",
   "scripts": {
+    "dev:all": "turbo run dev --parallel",
     "dev": "pnpm --filter api dev",
     "build": "turbo run build",
     "lint": "turbo run lint",

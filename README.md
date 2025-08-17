@@ -2,13 +2,9 @@
 
 Monorepo PNPM pour application mobile, backend API et portail web.
 
-Super 🚀 ! On va mettre en place un **setup complet** pour les autres packages (`web`, `mobile`, `shared`) afin que tu puisses les lancer avec PNPM aussi facilement que ton `api`.
-
----
+Packages (`web`, `mobile`, `shared`) afin que tu puisses les lancer avec PNPM aussi facilement que ton `api`.
 
 # 🌐 `packages/web` → Next.js (Portail Web)
-
----
 
 ## 1. Générer le projet
 
@@ -16,54 +12,17 @@ Super 🚀 ! On va mettre en place un **setup complet** pour les autres packages
 cd packages
 pnpm dlx create-next-app@latest web --typescript --eslint --app --src-dir --import-alias "@/*"
 ```
-
 ⚠️ Installe-le dans `packages/web`.
-
----
-
-## 2. Scripts `package.json`
-
-Dans `packages/web/package.json` :
-
-```json
-{
-  "name": "web",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "next": "14.2.3",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
-  },
-  "devDependencies": {
-    "typescript": "^5.4.5",
-    "eslint": "^9.7.0"
-  }
-}
-```
-
----
-
-## 3. Lancer en dev
 
 ```bash
 cd packages/web
 pnpm install
 pnpm dev
 ```
-
-👉 L’appli Next.js sera dispo sur **[http://localhost:3000](http://localhost:3000)**
+👉 L’appli Next.js sera dispo sur <http://localhost:3000>
 
 ---
-
 # 📱 `packages/mobile` → React Native / Expo
-
----
 
 ## 1. Générer le projet Expo
 
@@ -71,44 +30,11 @@ pnpm dev
 cd packages
 pnpm dlx create-expo-app mobile
 ```
-
----
-
-## 2. Scripts `package.json`
-
-Dans `packages/mobile/package.json` :
-
-```json
-{
-  "name": "mobile",
-  "private": true,
-  "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web"
-  },
-  "dependencies": {
-    "expo": "^51.0.0",
-    "react": "18.3.1",
-    "react-native": "0.73.6"
-  },
-  "devDependencies": {
-    "typescript": "^5.4.5"
-  }
-}
-```
-
----
-
-## 3. Lancer en dev
-
 ```bash
 cd packages/mobile
 pnpm install
 pnpm start
 ```
-
 👉 Expo te donnera un QR code pour lancer l’app sur ton téléphone ou un émulateur.
 
 ---
@@ -116,14 +42,12 @@ pnpm start
 # 📦 `packages/shared` → Code TypeScript partagé
 
 ---
-
 ## 1. Créer un package TS
 
 ```bash
 cd packages/shared
 pnpm init -y
 ```
-
 ---
 
 ## 2. `package.json`
@@ -178,10 +102,9 @@ export const formatDate = (date: Date): string => {
   return date.toISOString().split("T")[0];
 };
 ```
-
 ---
 
-# 🔗 Intégration dans le monorepo
+# Intégration dans le monorepo
 
 Grâce au `pnpm-workspace.yaml` :
 
@@ -215,9 +138,7 @@ Chaque package est reconnu par PNPM. Tu peux exécuter :
   ```bash
   pnpm --filter shared build
   ```
-
 ---
-
 # 🚀 Commandes globales depuis la racine
 
 * Lancer **uniquement l’API** :
