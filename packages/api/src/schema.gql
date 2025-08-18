@@ -141,12 +141,22 @@ type Medecin {
   weekendPremium: Int!
 }
 
+type Message {
+  attachments: [String!]!
+  body: String!
+  createdAt: DateTime!
+  id: ID!
+  sender: User
+  threadId: ID!
+}
+
 enum Mode {
   Presentiel
   Visio
 }
 
 type Mutation {
+  acceptPharmacyDispatch(dispatchId: String!, status: String!): PharmacyDispatch!
   addAssurance(assurance: String!, patientId: String!): Patient!
   bookAppointment(doctorId: String!, input: BookAppointmentInput!, patientId: String!): AppointmentType!
   cancelAppointment(appointmentId: String!, reason: String): AppointmentType!
@@ -157,6 +167,8 @@ type Mutation {
   paymentIntent(appointmentId: String!): Payment!
   refreshToken: AuthPayload!
   requestOtp(email: String, phone: String): Boolean!
+  sendMessage(input: SendMessageInput!): Message!
+  sendPrescriptionToPharmacy(input: SendPrescriptionInput!, jwtToken: String!): PharmacyDispatch!
   signPrescription(prescriptionId: String!): Prescription!
   signup(input: SignupInput!): AuthPayload!
   startTeleconsultation(appointmentId: String!): Appointment!
@@ -309,6 +321,7 @@ type Query {
   check: HealthStatus!
   doctorAvailabilities(doctorId: String!, from: String!, to: String!): [AvailabilityDTO!]!
   me: User!
+  messagesByThread(threadId: String!): [Message!]!
   patientByUser(userId: String!): Patient
   paymentIntent(appointmentId: String!): PaymentType!
   pharmaciesNearby(lat: Float!, lng: Float!, radiusKm: Float = 10): [PharmacyType!]!
@@ -322,6 +335,18 @@ enum Role {
   Medecin
   Patient
   Pharmacie
+}
+
+input SendMessageInput {
+  attachments: [String!]
+  body: String!
+  participants: [ID!]!
+  threadId: ID
+}
+
+input SendPrescriptionInput {
+  pharmacyId: String!
+  prescriptionId: String!
 }
 
 enum SignatureType {

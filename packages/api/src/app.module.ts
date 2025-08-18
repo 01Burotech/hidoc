@@ -21,6 +21,9 @@ import { PharmaciesModule } from './pharmacies/pharmacies.module';
 import { PaymentsModule } from './payments/payments.module';
 import { TeleconsultationModule } from './teleconsultation/teleconsultation.module';
 import { SignatureModule } from './signature/signature.module';
+import { PharmacyDispatchModule } from './pharmacies/dispatch/pharmacy-dispatch.module';
+import { MessagingModule } from './messaging/messaging.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -90,6 +93,9 @@ import { SignatureModule } from './signature/signature.module';
     PaymentsModule,
     TeleconsultationModule,
     SignatureModule,
+    PharmacyDispatchModule,
+    MessagingModule,
+    NotificationsModule,
   ],
   providers: [
     HealthResolver,
