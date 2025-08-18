@@ -8,10 +8,13 @@ import { json } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const logger = await app.resolve(PinoLogger);
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    }),
+  );
   app.enableCors({
     origin: process.env.CORS_ORIGIN?.split(',') ?? [],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
   app.use(json({ limit: '10mb' }));

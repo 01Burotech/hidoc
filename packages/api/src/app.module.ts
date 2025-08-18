@@ -9,6 +9,13 @@ import { envSchema } from './config/env.schema';
 import { HealthResolver } from './health.resolver';
 import { LoggerModule } from 'nestjs-pino';
 import { join } from 'path';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { GqlContext } from './common/decorators/gql-context.interface';
+import { MedecinModule } from './medecin/medecin.module';
+import { AvailabilityModule } from './availability/availability.module';
+import { AppointmentModule } from './appointment/appointment.module';
+import { PrescriptionModule } from './prescription/prescription.module';
 
 @Module({
   imports: [
@@ -48,6 +55,8 @@ import { join } from 'path';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
+      playground: true,
+      context: ({ req }: GqlContext) => ({ req }),
     }),
     // Logger
     LoggerModule.forRoot({
@@ -65,6 +74,12 @@ import { join } from 'path';
             : undefined,
       },
     }),
+    AuthModule,
+    UsersModule,
+    MedecinModule,
+    AvailabilityModule,
+    AppointmentModule,
+    PrescriptionModule,
   ],
   providers: [
     HealthResolver,

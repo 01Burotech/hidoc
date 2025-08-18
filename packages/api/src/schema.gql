@@ -2,10 +2,228 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Appointment {
+  availability: Availability
+  createdAt: DateTime!
+  deletedAt: DateTime
+  end: DateTime!
+  id: ID!
+  medecin: Medecin!
+  mode: Mode!
+  patient: Patient!
+  payment: Payment
+  prescription: Prescription
+  start: DateTime!
+  status: AppointmentStatus!
+  updatedAt: DateTime!
+}
+
+enum AppointmentStatus {
+  Cancelled
+  Completed
+  Confirmed
+  NoShow
+  Pending
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type Availability {
+  appointments: [Appointment!]
+  capacity: Int!
+  createdAt: DateTime!
+  deletedAt: DateTime
+  end: DateTime!
+  id: ID!
+  medecin: Medecin!
+  start: DateTime!
+  type: AvailabilityType!
+  updatedAt: DateTime!
+}
+
+enum AvailabilityType {
+  Weekday
+  Weekend
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type DoctorSignature {
+  certificateChain: String!
+  doctor: Medecin!
+  id: ID!
+  prescriptions: [Prescription!]!
+  signatureBlob: String!
+  signatureType: SignatureType!
+  signedAt: DateTime!
+  tsaToken: String!
+}
+
 type HealthStatus {
   status: String!
 }
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+enum KycStatus {
+  Pending
+  Rejected
+  Verified
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Medecin {
+  appointments: [Appointment!]
+  availabilities: [Availability!]
+  createdAt: DateTime!
+  deletedAt: DateTime
+  id: ID!
+  lieux: [String!]!
+  rpps: String!
+  signatures: [DoctorSignature!]
+  specialites: [String!]!
+  tarifs: Int!
+  updatedAt: DateTime!
+  user: User!
+  weekendPremium: Int!
+}
+
+enum Mode {
+  Presentiel
+  Visio
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthPayload!
+  loginWithOtp(input: OtpLoginInput!): AuthPayload!
+  refreshToken: AuthPayload!
+  requestOtp(email: String, phone: String): Boolean!
+  signup(input: SignupInput!): AuthPayload!
+}
+
+input OtpLoginInput {
+  email: String
+  otp: String!
+  phone: String
+}
+
+type Patient {
+  assurances: [String!]!
+  createdAt: DateTime!
+  dateNaissance: DateTime
+  deletedAt: DateTime
+  dossiers: String!
+  id: ID!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type Payment {
+  amount: Int!
+  appointment: Appointment
+  createdAt: DateTime!
+  currency: String!
+  doctor: Medecin
+  id: ID!
+  metadata: JSON!
+  patient: Patient
+  provider: String!
+  status: PaymentStatus!
+  updatedAt: DateTime!
+}
+
+enum PaymentStatus {
+  Canceled
+  Processing
+  Refunded
+  RequiresConfirmation
+  RequiresPaymentMethod
+  Succeeded
+}
+
+type Prescription {
+  appointment: Appointment!
+  createdAt: DateTime!
+  deletedAt: DateTime
+  doctorSignature: DoctorSignature
+  hash: String!
+  id: ID!
+  items: [PrescriptionItem!]!
+  pdfUrl: String
+  sentToPharmacies: [String!]!
+  status: PrescriptionStatus!
+  updatedAt: DateTime!
+}
+
+type PrescriptionItem {
+  code: String
+  denomination: String!
+  dosage: String!
+  dureeJours: Int!
+  forme: String!
+  id: ID!
+  posologie: String!
+  prescription: Prescription!
+  renouvellement: Int!
+}
+
+enum PrescriptionStatus {
+  Draft
+  Revoked
+  Signed
+}
+
 type Query {
   check: HealthStatus!
+  me: User!
+  users: [User!]!
+}
+
+enum Role {
+  Admin
+  Medecin
+  Patient
+  Pharmacie
+}
+
+enum SignatureType {
+  AES
+  QES
+}
+
+input SignupInput {
+  email: String!
+  isOtpOnly: Boolean = false
+  password: String
+  phone: String
+  role: Role! = Patient
+}
+
+type User {
+  createdAt: DateTime!
+  deletedAt: DateTime
+  email: String!
+  id: ID!
+  isOtpOnly: Boolean!
+  kycStatus: KycStatus!
+  medecin: Medecin
+  patient: Patient
+  phone: String!
+  role: Role!
+  twoFAEnabled: Boolean!
+  updatedAt: DateTime
 }
