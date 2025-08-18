@@ -16,7 +16,6 @@ import { Appointment } from './appointment.entity';
 import { AvailabilityType } from './enums';
 import { registerEnumType } from '@nestjs/graphql';
 
-// 👇 Enregistre l'enum pour GraphQL
 registerEnumType(AvailabilityType, { name: 'AvailabilityType' });
 
 @ObjectType()

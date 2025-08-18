@@ -1,103 +1,116 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
+import { UsersService } from '../users/users.service';
 import { User } from '../entities/user.entity';
-import { OtpService } from '../otp/otp.service';
 import { Role } from 'src/entities/enums';
+import { OtpService } from '../otp/otp.service';
+import { OtpLoginInput } from './dtos/login.input';
+import { SignupInput } from './dtos/signup.input';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private otpService: OtpService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly otpService: OtpService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<User | null> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user || !user.passwordHash) return null;
-    const valid = await bcrypt.compare(pass, user.passwordHash);
-    return valid ? user : null;
-  }
-
-  login(user: User) {
+  /** Génère access/refresh tokens + user */
+  private generateTokens(user: User) {
     const payload = { sub: user.id, role: user.role };
     return {
       accessToken: this.jwtService.sign(payload, {
         secret: process.env.JWT_ACCESS_SECRET,
+        expiresIn: '15m',
       }),
       refreshToken: this.jwtService.sign(payload, {
         secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: '7d',
       }),
       user,
     };
   }
 
-  async signup(email: string, password: string) {
-    const existing = await this.usersService.findByEmail(email);
-    if (existing) throw new UnauthorizedException('Email already exists');
-    const user = await this.usersService.create(email, password);
-    return this.login(user);
-  }
-
-  refreshToken(user: User) {
-    return this.login(user);
-  }
-
-  async requestOtp(email: string) {
-    const otp = await this.otpService.generateOtp(email);
-    return { success: true, otp };
-  }
-
-  async loginWithOtp(email: string, otp: string) {
-    const valid = await this.otpService.verifyOtp(email, otp);
-    if (!valid) throw new UnauthorizedException('Invalid OTP');
-    let user = await this.usersService.findByEmail(email);
-    if (!user) {
-      user = await this.usersService.create(email, null);
+  /** Login email/password */
+  async loginWithEmailPassword(email: string, password: string) {
+    const user = await this.usersService.findByEmail(email);
+    if (!user || !user.passwordHash) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-    return this.login(user);
+
+    const valid = await bcrypt.compare(password, user.passwordHash);
+    if (!valid) throw new UnauthorizedException('Invalid credentials');
+
+    return this.generateTokens(user);
   }
 
-  /** Login / Signup par OTP téléphone */
-  async loginWithPhoneOtp(phone: string, otp: string) {
-    const valid = await this.otpService.verifyOtp(phone, otp);
-    if (!valid) throw new UnauthorizedException('Invalid OTP');
-    let user = await this.usersService.findByPhone(phone);
-    if (!user) {
-      user = await this.usersService.create(undefined, null, {
-        phone,
-        isOtpOnly: true,
-      });
-    }
-    return this.login(user);
-  }
-
-  async requestOtpPhone(phone: string) {
-    const otp = await this.otpService.generateOtp(phone);
-    return { success: true, otp }; // envoyer SMS via provider
-  }
-
-  async createUser(options: {
-    email?: string;
-    password?: string | null;
-    phone?: string;
-    isOtpOnly?: boolean;
-    role?: Role;
-  }) {
-    const { email, password, phone, isOtpOnly, role } = options;
-
-    // Vérifie si l'email existe déjà
+  /** Signup (email/password ou téléphone) */
+  async signup(input: SignupInput) {
+    const { email, password, phone, isOtpOnly, role } = input;
+    // Vérifie email ou phone déjà existant
     if (email) {
       const existing = await this.usersService.findByEmail(email);
-      if (existing) throw new Error('Email already exists');
+      if (existing) throw new UnauthorizedException('Email already exists');
+    }
+    if (phone) {
+      const existing = await this.usersService.findByPhone(phone);
+      if (existing) throw new UnauthorizedException('Phone already exists');
     }
 
-    return this.usersService.create(email, password, {
+    const user = await this.usersService.create(email, password ?? null, {
       phone,
       isOtpOnly,
-      role,
+      role: role ?? Role.Patient,
     });
+
+    return this.generateTokens(user);
+  }
+
+  /** Refresh token */
+  refreshToken(user: User) {
+    return this.generateTokens(user);
+  }
+
+  /** Demander OTP (email ou téléphone) */
+  async requestOtp(email?: string, phone?: string) {
+    if (email) {
+      await this.otpService.generateOtp(email);
+      // TODO: envoi email
+    }
+    if (phone) {
+      await this.otpService.generateOtp(phone);
+      // TODO: envoi SMS
+    }
+    return true;
+  }
+
+  /** Login ou signup par OTP (email ou téléphone) */
+  async loginWithOtp(input: OtpLoginInput) {
+    const identifier = input.email ?? input.phone;
+    if (!identifier) throw new Error('Email or phone is required');
+
+    const valid = await this.otpService.verifyOtp(identifier, input.otp);
+    if (!valid) throw new UnauthorizedException('Invalid OTP');
+
+    let user: User | null = null;
+    if (input.email) {
+      user = await this.usersService.findByEmail(input.email);
+      if (!user) {
+        user = await this.usersService.create(input.email, null, {
+          isOtpOnly: true,
+        });
+      }
+    } else if (input.phone) {
+      user = await this.usersService.findByPhone(input.phone);
+      if (!user) {
+        user = await this.usersService.create(undefined, null, {
+          phone: input.phone,
+          isOtpOnly: true,
+        });
+      }
+    }
+
+    return this.generateTokens(user!);
   }
 }

@@ -5,7 +5,6 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -37,7 +36,7 @@ export class Prescription {
   appointment!: Appointment;
 
   @Field(() => DoctorSignature, { nullable: true })
-  @ManyToOne(() => DoctorSignature, (s) => s.prescriptions, {
+  @OneToOne(() => DoctorSignature, (s) => s.prescriptions, {
     nullable: true,
     onDelete: 'SET NULL',
     eager: true,
@@ -60,6 +59,10 @@ export class Prescription {
     default: PrescriptionStatus.Draft,
   })
   status!: PrescriptionStatus;
+
+  @Column({ type: 'text', nullable: true })
+  @Field({ nullable: true })
+  jsonPayload?: string;
 
   @Field(() => [String])
   @Column({ type: 'uuid', array: true, default: '{}', nullable: false })

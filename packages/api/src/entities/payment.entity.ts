@@ -79,6 +79,10 @@ export class Payment {
   @Column({ type: 'jsonb', default: {} })
   metadata!: Record<string, unknown>;
 
+  @Field({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  clientSecret?: string; // <-- AJOUTÉ
+
   @Field()
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;

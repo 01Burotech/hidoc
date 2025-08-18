@@ -13,4 +13,8 @@ export const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string(),
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  STRIPE_SECRET: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.string().default('6379'),
 });

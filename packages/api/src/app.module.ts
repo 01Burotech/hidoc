@@ -14,8 +14,13 @@ import { UsersModule } from './users/users.module';
 import { GqlContext } from './common/decorators/gql-context.interface';
 import { MedecinModule } from './medecin/medecin.module';
 import { AvailabilityModule } from './availability/availability.module';
-import { AppointmentModule } from './appointment/appointment.module';
-import { PrescriptionModule } from './prescription/prescription.module';
+import { AppointmentsModule } from './appointment/appointment.module';
+import { PrescriptionsModule } from './prescriptions/prescriptions.module';
+import { PatientsModule } from './patient/patient.module';
+import { PharmaciesModule } from './pharmacies/pharmacies.module';
+import { PaymentsModule } from './payments/payments.module';
+import { TeleconsultationModule } from './teleconsultation/teleconsultation.module';
+import { SignatureModule } from './signature/signature.module';
 
 @Module({
   imports: [
@@ -78,8 +83,13 @@ import { PrescriptionModule } from './prescription/prescription.module';
     UsersModule,
     MedecinModule,
     AvailabilityModule,
-    AppointmentModule,
-    PrescriptionModule,
+    AppointmentsModule,
+    PrescriptionsModule,
+    PatientsModule,
+    PharmaciesModule,
+    PaymentsModule,
+    TeleconsultationModule,
+    SignatureModule,
   ],
   providers: [
     HealthResolver,

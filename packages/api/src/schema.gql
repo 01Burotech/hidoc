@@ -26,6 +26,17 @@ enum AppointmentStatus {
   Pending
 }
 
+type AppointmentType {
+  end: DateTime!
+  id: ID!
+  medecin: Medecin!
+  mode: String!
+  patient: Patient!
+  payment: PaymentType!
+  start: DateTime!
+  status: String!
+}
+
 type AuthPayload {
   accessToken: String!
   refreshToken: String!
@@ -45,9 +56,37 @@ type Availability {
   updatedAt: DateTime!
 }
 
+type AvailabilityDTO {
+  capacity: Float!
+  end: DateTime!
+  id: ID!
+  medecin: Medecin!
+  start: DateTime!
+  type: String!
+}
+
 enum AvailabilityType {
   Weekday
   Weekend
+}
+
+input BookAppointmentInput {
+  end: DateTime!
+  mode: String!
+  paymentMethodId: String
+  start: DateTime!
+}
+
+input CreateAvailabilityInput {
+  end: DateTime!
+  recurring: Boolean
+  start: DateTime!
+  type: String!
+}
+
+input CreatePrescriptionInput {
+  appointmentId: String!
+  items: [PrescriptionItemInput!]!
 }
 
 """
@@ -108,11 +147,20 @@ enum Mode {
 }
 
 type Mutation {
+  addAssurance(assurance: String!, patientId: String!): Patient!
+  bookAppointment(doctorId: String!, input: BookAppointmentInput!, patientId: String!): AppointmentType!
+  cancelAppointment(appointmentId: String!, reason: String): AppointmentType!
+  createAvailability(doctorId: String!, input: CreateAvailabilityInput!): [AvailabilityDTO!]!
+  createPrescription(input: CreatePrescriptionInput!): Prescription!
   login(input: LoginInput!): AuthPayload!
   loginWithOtp(input: OtpLoginInput!): AuthPayload!
+  paymentIntent(appointmentId: String!): Payment!
   refreshToken: AuthPayload!
   requestOtp(email: String, phone: String): Boolean!
+  signPrescription(prescriptionId: String!): Prescription!
   signup(input: SignupInput!): AuthPayload!
+  startTeleconsultation(appointmentId: String!): Appointment!
+  updateDossiers(dossiers: String!, patientId: String!): Patient!
 }
 
 input OtpLoginInput {
@@ -135,6 +183,7 @@ type Patient {
 type Payment {
   amount: Int!
   appointment: Appointment
+  clientSecret: String
   createdAt: DateTime!
   currency: String!
   doctor: Medecin
@@ -155,6 +204,63 @@ enum PaymentStatus {
   Succeeded
 }
 
+type PaymentType {
+  amount: Int!
+  clientSecret: String
+  currency: String!
+  id: ID!
+  provider: String!
+  status: String!
+}
+
+type Pharmacie {
+  adresse: String!
+  apiEndpoint: String!
+  createdAt: DateTime!
+  deletedAt: DateTime
+  dispatches: [PharmacyDispatch!]!
+  gln: String!
+  id: ID!
+  lat: Float!
+  lng: Float!
+  nom: String!
+  publicKey: String!
+  updatedAt: DateTime!
+}
+
+type PharmacyDispatch {
+  acceptedAt: DateTime
+  createdAt: DateTime!
+  dispensedAt: DateTime
+  id: ID!
+  pharmacie: Pharmacie!
+  preparedAt: DateTime
+  prescription: Prescription!
+  receivedAt: DateTime
+  rejectionReason: String
+  status: PharmacyDispatchStatus!
+  updatedAt: DateTime!
+}
+
+enum PharmacyDispatchStatus {
+  Accepted
+  Dispensed
+  Prepared
+  Received
+  Rejected
+}
+
+type PharmacyType {
+  adresse: String!
+  apiEndpoint: String!
+  gln: String!
+  id: ID!
+  lat: Float!
+  lng: Float!
+  nom: String!
+  publicKey: String!
+}
+
 type Prescription {
   appointment: Appointment!
   createdAt: DateTime!
@@ -163,6 +269,7 @@ type Prescription {
   hash: String!
   id: ID!
   items: [PrescriptionItem!]!
+  jsonPayload: String
   pdfUrl: String
   sentToPharmacies: [String!]!
   status: PrescriptionStatus!
@@ -181,6 +288,16 @@ type PrescriptionItem {
   renouvellement: Int!
 }
 
+input PrescriptionItemInput {
+  code: String!
+  denomination: String!
+  dosage: String!
+  dureeJours: Float!
+  forme: String!
+  posologie: String!
+  renouvellement: Float!
+}
+
 enum PrescriptionStatus {
   Draft
   Revoked
@@ -188,8 +305,15 @@ enum PrescriptionStatus {
 }
 
 type Query {
+  MediaCapabilities(from: String!, medecinId: String!, to: String!): [Availability!]!
   check: HealthStatus!
+  doctorAvailabilities(doctorId: String!, from: String!, to: String!): [AvailabilityDTO!]!
   me: User!
+  patientByUser(userId: String!): Patient
+  paymentIntent(appointmentId: String!): PaymentType!
+  pharmaciesNearby(lat: Float!, lng: Float!, radiusKm: Float = 10): [PharmacyType!]!
+  prescription(id: String!): Prescription!
+  searchMedecins(date: String!, specialite: String!, weekendOnly: Boolean): [Medecin!]!
   users: [User!]!
 }
 
@@ -211,6 +335,11 @@ input SignupInput {
   password: String
   phone: String
   role: Role! = Patient
+}
+
+type TeleconsultationSessionType {
+  appointmentId: String!
+  sessionUrl: String!
 }
 
 type User {

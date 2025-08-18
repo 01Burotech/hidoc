@@ -8,10 +8,18 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ObjectType, Field, ID, GraphQLISODateTime } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  ID,
+  GraphQLISODateTime,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { Prescription } from './prescription.entity';
 import { Pharmacie } from './pharmacie.entity';
 import { PharmacyDispatchStatus } from './enums';
+
+registerEnumType(PharmacyDispatchStatus, { name: 'PharmacyDispatchStatus' });
 
 @ObjectType()
 @Entity({ name: 'pharmacy_dispatches' })
@@ -42,9 +50,9 @@ export class PharmacyDispatch {
   })
   status!: PharmacyDispatchStatus;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'text', nullable: true })
-  rejectionReason?: string | null;
+  rejectionReason?: string;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   @Column({ type: 'timestamptz', nullable: true })
