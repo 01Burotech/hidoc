@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -24,6 +25,7 @@ import { SignatureModule } from './signature/signature.module';
 import { PharmacyDispatchModule } from './pharmacies/dispatch/pharmacy-dispatch.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -96,6 +98,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PharmacyDispatchModule,
     MessagingModule,
     NotificationsModule,
+    AuditModule,
   ],
   providers: [
     HealthResolver,
@@ -133,4 +136,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestIdMiddleware).forRoutes('*');
+  }
+}

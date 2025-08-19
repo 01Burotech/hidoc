@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { PinoLogger } from 'nestjs-pino';
+//import { PinoLogger } from 'nestjs-pino';
 import helmet from 'helmet';
 import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  const logger = await app.resolve(PinoLogger);
+  //const logger = await app.resolve(PinoLogger);
   app.use(
     helmet({
       contentSecurityPolicy: false,
@@ -21,7 +21,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
-  logger.info('Application starting...');
+  //logger.info('Application starting...');
   await app.listen(process.env.PORT || 4000);
 }
 bootstrap();
