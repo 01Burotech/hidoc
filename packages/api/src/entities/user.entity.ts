@@ -36,7 +36,7 @@ export class User {
 
   @Field()
   @Column({ type: 'varchar', length: 32, unique: true })
-  phone!: string;
+  phone?: string;
 
   // tu peux cacher le mot de passe à GraphQL
   @Column({ nullable: true })

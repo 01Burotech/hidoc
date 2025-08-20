@@ -6,7 +6,6 @@ export const initSentry = () => {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     tracesSampleRate: 1.0,
-    integrations: [new Sentry.Integrations.Http({ tracing: true })],
   });
 
   console.log('[Sentry] Initialized');

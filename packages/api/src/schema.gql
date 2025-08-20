@@ -134,7 +134,7 @@ type Medecin {
   lieux: [String!]!
   rpps: String!
   signatures: [DoctorSignature!]
-  specialites: [String!]!
+  specialites: [Specialite!]!
   tarifs: Int!
   updatedAt: DateTime!
   user: User!
@@ -160,6 +160,7 @@ type Mutation {
   addAssurance(assurance: String!, patientId: String!): Patient!
   bookAppointment(doctorId: String!, input: BookAppointmentInput!, patientId: String!): AppointmentType!
   cancelAppointment(appointmentId: String!, reason: String): AppointmentType!
+  consent(scope: String!): Boolean!
   createAvailability(doctorId: String!, input: CreateAvailabilityInput!): [AvailabilityDTO!]!
   createPrescription(input: CreatePrescriptionInput!): Prescription!
   login(input: LoginInput!): AuthPayload!
@@ -167,6 +168,7 @@ type Mutation {
   paymentIntent(appointmentId: String!): Payment!
   refreshToken: AuthPayload!
   requestOtp(email: String, phone: String): Boolean!
+  revokeConsent(scope: String!): Boolean!
   sendMessage(input: SendMessageInput!): Message!
   sendPrescriptionToPharmacy(input: SendPrescriptionInput!, jwtToken: String!): PharmacyDispatch!
   signPrescription(prescriptionId: String!): Prescription!
@@ -360,6 +362,11 @@ input SignupInput {
   password: String
   phone: String
   role: Role! = Patient
+}
+
+type Specialite {
+  id: ID!
+  nom: String!
 }
 
 type TeleconsultationSessionType {

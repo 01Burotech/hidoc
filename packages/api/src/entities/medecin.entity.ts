@@ -6,6 +6,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -15,6 +17,7 @@ import { User } from './user.entity';
 import { Availability } from './availability.entity';
 import { Appointment } from './appointment.entity';
 import { DoctorSignature } from './doctor-signature.entity';
+import { Specialite } from './specialite.entity';
 
 @ObjectType()
 @Entity({ name: 'medecins' })
@@ -29,9 +32,10 @@ export class Medecin {
   @JoinColumn({ name: 'user_id' })
   user!: User;
 
-  @Field(() => [String])
-  @Column({ type: 'text', array: true, default: '{}' })
-  specialites!: string[];
+  @Field(() => [Specialite])
+  @ManyToMany(() => Specialite)
+  @JoinTable({ name: 'medecin_specialites' })
+  specialites!: Specialite[];
 
   @Field(() => [String])
   @Column({ type: 'text', array: true, default: '{}' })

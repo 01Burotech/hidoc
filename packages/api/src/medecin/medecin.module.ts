@@ -7,10 +7,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RedisCacheInterceptor } from '../common/interceptors/redis-cache.interceptor';
 import { MedecinResolver } from './medecin.resolver';
 import { MedecinService } from './medecin.service';
+import { Specialite } from 'src/entities/specialite.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Medecin, Availability]),
+    TypeOrmModule.forFeature([Medecin, Availability, Specialite]),
     CacheModule.register(),
   ],
   providers: [

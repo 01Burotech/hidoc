@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, In } from 'typeorm';
 import { Medecin } from '../entities/medecin.entity';
 import { Availability } from '../entities/availability.entity';
 import { SearchMedecinsInput } from './dto/search-medecins.input';
+import { Specialite } from 'src/entities/specialite.entity';
 
 @Injectable()
 export class MedecinService {
@@ -12,11 +13,23 @@ export class MedecinService {
     private medecinRepository: Repository<Medecin>,
     @InjectRepository(Availability)
     private availRepository: Repository<Availability>,
+    @InjectRepository(Specialite)
+    private specialiteRepository: Repository<Specialite>,
   ) {}
 
   async createDemoMedecin(partial: Partial<Medecin>): Promise<Medecin> {
-    const d = this.medecinRepository.create(partial);
-    return this.medecinRepository.save(d);
+    const medecin = this.medecinRepository.create(partial);
+
+    // Si des noms de specialités sont passés dans partial.specialites
+    if (partial.specialites && partial.specialites.length > 0) {
+      // On récupère les entités Specialite correspondantes
+      const specialites = await this.specialiteRepository.findBy({
+        nom: In(partial.specialites ? partial.specialites : []),
+      });
+      medecin.specialites = specialites;
+    }
+
+    return this.medecinRepository.save(medecin);
   }
 
   async findById(id: string): Promise<Medecin | null> {

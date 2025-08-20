@@ -27,7 +27,7 @@ export class Patient {
 
   @Field(() => Date, { nullable: true })
   @Column({ type: 'date', nullable: true })
-  dateNaissance?: string | null;
+  dateNaissance?: Date | null;
 
   @Field(() => [String])
   @Column({ type: 'text', array: true, default: '{}' })

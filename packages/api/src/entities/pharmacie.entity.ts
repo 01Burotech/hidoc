@@ -48,11 +48,11 @@ export class Pharmacie {
 
   @Field(() => Float)
   @Column({ type: 'numeric', precision: 9, scale: 6 })
-  lat!: string;
+  lat!: number;
 
   @Field(() => Float)
   @Column({ type: 'numeric', precision: 9, scale: 6 })
-  lng!: string;
+  lng!: number;
 
   @Field(() => GraphQLISODateTime)
   @CreateDateColumn({ type: 'timestamptz' })
