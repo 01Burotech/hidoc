@@ -1,18 +1,12 @@
+"use client";
 import { useQuery, gql } from "@apollo/client";
-
-const PHARMACIES_QUERY = gql`
-  query PharmaciesNearby($lat: Float!, $lng: Float!) {
-    pharmaciesNearby(lat: $lat, lng: $lng) {
-      id
-      nom
-      adresse
-      status
-    }
-  }
-`;
+import { PHARMACIES_NEARBY } from "../../../graphql/queries";
 
 export default function PharmacyDashboard() {
-  const { data } = useQuery(PHARMACIES_QUERY, { variables: { lat: 48.8566, lng: 2.3522 } });
+  const { data, loading, error } = useQuery(PHARMACIES_NEARBY, {
+    variables: { lat: 6.370774, lng: 2.394587, radiusKm: 5 },
+  });
+  console.log("GraphQL data:", data);
 
   return (
     <div className="p-8">

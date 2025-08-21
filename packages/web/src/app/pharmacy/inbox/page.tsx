@@ -1,20 +1,9 @@
 "use client";
 import { useState } from "react";
-import { useQuery, gql } from "@apollo/client";
-import PrescriptionTable from "@/components/pharmacy/PrescriptionTable";
-import PrescriptionDetail from "@/components/pharmacy/PrescriptionDetail";
-
-const PRESCRIPTIONS_QUERY = gql`
-  query PharmacyPrescriptions {
-    pharmacyPrescriptions {
-      id
-      patient { userId }
-      doctor { userId }
-      status
-      createdAt
-    }
-  }
-`;
+import { useQuery } from "@apollo/client";
+import PrescriptionDetail from "../../../../components/pharmacy/PrescriptionDetail";
+import PrescriptionTable from "../../../../components/pharmacy/PrescriptionTable";
+import { PRESCRIPTIONS_QUERY } from "../../../../graphql/queries";
 
 export default function InboxPage() {
   const { data, refetch } = useQuery(PRESCRIPTIONS_QUERY);
